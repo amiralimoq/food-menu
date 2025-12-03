@@ -1,86 +1,24 @@
-<!DOCTYPE html>
-<html lang="fa" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>منوی رستوران</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <style>
-        body { font-family: Tahoma, sans-serif; background: #f5f5f5; padding: 20px; color: #333; }
-        .card { background: white; padding: 15px; margin-bottom: 10px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; }
-        .btn { background: #3390ec; color: white; border: none; padding: 5px 15px; border-radius: 5px; cursor: pointer; }
-        .btn-remove { background: #e53935; }
-        #order-btn { width: 100%; padding: 15px; background: #2ecc71; color: white; border: none; font-size: 16px; border-radius: 10px; margin-top: 20px; display: none; }
-    </style>
-</head>
-<body>
-
-    <h2>🍔 منوی امروز</h2>
-    <div id="menu-list"></div>
-    <button id="order-btn" onclick="sendOrder()">تکمیل سفارش</button>
-
-    <script>
-        const tg = window.Telegram.WebApp;
-        tg.expand(); // تمام صفحه کردن در موبایل
-
-        // 1. لیست غذاها (دیتابیس ساده شما)
-        const menu = [
-            { id: 1, name: "پیتزا مخصوص", price: 250000 },
-            { id: 2, name: "همبرگر ذغالی", price: 180000 },
-            { id: 3, name: "سیب‌زمینی سرخ‌کرده", price: 90000 },
-            { id: 4, name: "نوشابه قوطی", price: 30000 }
-        ];
-
-        let cart = {};
-
-        // 2. نمایش منو در صفحه
-        const menuContainer = document.getElementById('menu-list');
-        menu.forEach(item => {
-            const el = document.createElement('div');
-            el.className = 'card';
-            el.innerHTML = 
-                <div>
-                    <b>${item.name}</b><br>
-                    <small>${item.price.toLocaleString()} تومان</small>
-                </div>
-                <button class="btn" onclick="addToCart(${item.id})">افزودن</button>
-            ;
-            menuContainer.appendChild(el);
-        });
-
-        // 3. افزودن به سبد خرید
-        function addToCart(id) {
-            if (!cart[id]) cart[id] = 0;
-            cart[id]++;
-            document.getElementById('order-btn').style.display = 'block';
-            document.getElementById('order-btn').innerText = ثبت سفارش (تعداد: ${Object.values(cart).reduce((a,b)=>a+b, 0)});
-            
-            // نمایش دکمه اصلی تلگرام (MainButton)
-            tg.MainButton.setText("تایید نهایی سفارش");
-            tg.MainButton.show();
-        }
-
-        // 4. ارسال اطلاعات به ربات تلگرام
-        // هم با دکمه داخل صفحه و هم با دکمه اصلی تلگرام کار می‌کند
-        tg.MainButton.onClick(() => sendOrder());
-
-        function sendOrder() {
-            const orderDetails = {
-                items: cart,
-                total_price: calculateTotal()
+window.sendOrder = function() {
+                const total = calculateTotal();
+                const orderData = {
+                    items: cart,
+                    total_price: total
+                };
+                tg.sendData(JSON.stringify(orderData));
             };
-            // این خط جادویی داده‌ها را به ربات می‌فرستد
-            tg.sendData(JSON.stringify(orderDetails)); 
-        }
 
-        function calculateTotal() {
-            let total = 0;
-            for (const [id, count] of Object.entries(cart)) {
-                const item = menu.find(i => i.id == id);
-                total += item.price * count;
+            function calculateTotal() {
+                let total = 0;
+                for (const [id, count] of Object.entries(cart)) {
+                    const item = menu.find(i => i.id == id);
+                    total += item.price * count;
+                }
+                return total;
             }
-            return total;
-        }
+
+            // اتصال دکمه اصلی تلگرام به تابع ارسال
+            tg.MainButton.onClick(window.sendOrder);
+        });
     </script>
 </body>
 </html>
