@@ -1,1 +1,31 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>رستوران نمونه</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+<body>
 
+    <header>
+        <h1>🍔 رستوران خوشمزه</h1>
+        <p>بهترین طعم‌ها را تجربه کنید</p>
+    </header>
+
+    <div class="container">
+        <div id="menu-list" class="menu-grid"></div>
+    </div>
+
+    <div class="bottom-bar" id="bottom-bar">
+        <div class="total-price">
+            <span>جمع کل:</span>
+            <span id="total-amount">0</span> تومان
+        </div>
+        <button id="order-btn" onclick="sendOrder()">ثبت سفارش ✅</button>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
